@@ -11,7 +11,7 @@ export default function SpecificationsPage() {
             <div className="relative aspect-square">
               <Image
                 src="/sleek-black-smart-pet-collar-on-pure-black-backgro.jpg"
-                alt="PetX Smart Collar"
+                alt="Finstinct Smart Collar"
                 fill
                 className="object-contain"
               />
@@ -129,7 +129,7 @@ export default function SpecificationsPage() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  PetX Smart Collar
+                  Finstinct Smart Collar
                 </li>
                 <li className="flex items-center gap-3 text-gray-300">
                   <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">

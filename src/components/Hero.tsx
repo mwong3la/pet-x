@@ -8,7 +8,7 @@ export default function Hero() {
       <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 flex-1 flex flex-col justify-center pt-24">
         <div className="text-center mb-8">
           <p className="text-xs md:text-sm tracking-[0.3em] uppercase text-gray-400 mb-12">
-            Meet • PetX
+            Meet • Finstinct
           </p>
         </div>
 
@@ -22,7 +22,7 @@ export default function Hero() {
           <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black z-10 pointer-events-none" />
           <Image
             src="/sleek-black-smart-pet-collar-on-pure-black-backgro.jpg"
-            alt="PetX Smart Collar"
+            alt="Finstinct Smart Collar"
             fill
             className="object-contain opacity-90"
             priority

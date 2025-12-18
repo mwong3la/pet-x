@@ -10,12 +10,12 @@ export default function SupportPage() {
     {
       question: "How long does the battery last?",
       answer:
-        "The PetX collar battery lasts up to 30 days on a single charge with normal use. Battery life may vary depending on GPS tracking frequency and usage patterns.",
+        "The Finstinct collar battery lasts up to 30 days on a single charge with normal use. Battery life may vary depending on GPS tracking frequency and usage patterns.",
     },
     {
       question: "Is the collar waterproof?",
       answer:
-        "Yes! The PetX collar has an IP68 rating, making it fully waterproof and dustproof. Your pet can swim, play in the rain, and get dirty without any issues.",
+        "Yes! The Finstinct collar has an IP68 rating, making it fully waterproof and dustproof. Your pet can swim, play in the rain, and get dirty without any issues.",
     },
     {
       question: "What sizes are available?",
@@ -25,7 +25,7 @@ export default function SupportPage() {
     {
       question: "Does it work internationally?",
       answer:
-        "Yes, the PetX collar works in over 175 countries worldwide using global cellular networks. A subscription is required for GPS tracking services.",
+        "Yes, the Finstinct collar works in over 175 countries worldwide using global cellular networks. A subscription is required for GPS tracking services.",
     },
     {
       question: "What's included in the subscription?",
@@ -35,7 +35,7 @@ export default function SupportPage() {
     {
       question: "How accurate is the GPS tracking?",
       answer:
-        "The PetX collar uses multi-constellation GPS (GPS, GLONASS, Galileo) for accuracy within 5-10 meters in most conditions. Updates are provided every 30 seconds during active tracking.",
+        "The Finstinct collar uses multi-constellation GPS (GPS, GLONASS, Galileo) for accuracy within 5-10 meters in most conditions. Updates are provided every 30 seconds during active tracking.",
     },
   ];
 
@@ -121,7 +121,7 @@ export default function SupportPage() {
                 Our support team is ready to assist you
               </p>
               <a
-                href="mailto:support@petx.com"
+                href="mailto:support@Finstinct.com"
                 className="inline-block bg-white text-black px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition-colors"
               >
                 Contact Support

@@ -133,7 +133,7 @@ export default function FeaturesPage() {
               <div>
                 <h2 className="text-5xl font-light mb-6 text-balance">Waterproof & Durable</h2>
                 <p className="text-lg text-gray-400 mb-8 leading-relaxed">
-                  Built to withstand any adventure. The PetX collar is IP68 rated, making it fully waterproof and
+                  Built to withstand any adventure. The Finstinct collar is IP68 rated, making it fully waterproof and
                   dustproof for all conditions.
                 </p>
                 <ul className="space-y-4">
@@ -175,13 +175,13 @@ export default function FeaturesPage() {
           <div className="mt-32 relative h-[70vh] rounded-2xl overflow-hidden">
             <Image
               src="/sleek-black-smart-pet-collar-on-pure-black-backgro.jpg"
-              alt="PetX Collar"
+              alt="Finstinct Collar"
               fill
               className="object-contain"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-12 text-center">
-              <h2 className="text-4xl md:text-5xl font-light mb-4">Ready to experience PetX?</h2>
+              <h2 className="text-4xl md:text-5xl font-light mb-4">Ready to experience Finstinct?</h2>
               <p className="text-xl text-gray-400 mb-8">Join thousands of pet owners keeping their pets safe</p>
               <a
                 href="/register"

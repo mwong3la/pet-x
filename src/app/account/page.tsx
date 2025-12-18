@@ -137,7 +137,7 @@ export default function AccountPage() {
                   <path d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <p className="text-gray-600 mb-4">Manage connected PetX devices</p>
+              <p className="text-gray-600 mb-4">Manage connected Finstinct devices</p>
               <Link href="/account/devices" className="text-blue-600 text-sm hover:underline font-medium">
                 View devices
               </Link>

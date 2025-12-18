@@ -22,7 +22,7 @@ export default function Navigation() {
               href="/"
               className="text-2xl font-light tracking-tight text-white hover:text-gray-300 transition-colors"
             >
-              PetX
+              Finstinct
             </Link>
           </div>
 

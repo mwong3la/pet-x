@@ -28,7 +28,7 @@ export default function OrdersPage() {
       items: [
         {
           id: "1",
-          name: "PetX Smart Collar",
+          name: "Finstinct Smart Collar",
           image: "/sleek-black-smart-pet-collar-on-white-background-m.jpg",
           price: 199,
           quantity: 1,
@@ -43,7 +43,7 @@ export default function OrdersPage() {
       items: [
         {
           id: "2",
-          name: "PetX Smart Collar",
+          name: "Finstinct Smart Collar",
           image: "/sleek-black-smart-pet-collar-on-white-background-m.jpg",
           price: 199,
           quantity: 2,

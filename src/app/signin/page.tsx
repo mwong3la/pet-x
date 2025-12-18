@@ -49,7 +49,7 @@ export default function SignInPage() {
             href="/"
             className="text-3xl font-light tracking-tight text-black hover:text-gray-600 transition-colors"
           >
-            PetX
+            Finstinct
           </Link>
         </div>
 

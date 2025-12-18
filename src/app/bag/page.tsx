@@ -18,7 +18,7 @@ export default function BagPage() {
   const [bagItems, setBagItems] = useState<BagItem[]>([
     {
       id: "1",
-      name: "PetX Smart Collar",
+      name: "Finstinct Smart Collar",
       image: "/sleek-black-smart-pet-collar-on-white-background-m.jpg",
       price: 199,
       quantity: 1,
