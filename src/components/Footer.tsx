@@ -11,7 +11,7 @@ export default function Footer() {
                   href="#"
                   className="text-sm text-gray-600 hover:text-black transition-colors"
                 >
-                  Buy PetConnect Pro
+                  Buy PetConnect
                 </a>
               </li>
               <li>
@@ -20,14 +20,6 @@ export default function Footer() {
                   className="text-sm text-gray-600 hover:text-black transition-colors"
                 >
                   Accessories
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-sm text-gray-600 hover:text-black transition-colors"
-                >
-                  Gift Cards
                 </a>
               </li>
             </ul>
@@ -120,21 +112,13 @@ export default function Footer() {
                   Terms of Service
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-sm text-gray-600 hover:text-black transition-colors"
-                >
-                  Cookie Policy
-                </a>
-              </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600">
-            © 2025 PetTech. All rights reserved.
+            © 2025 PetX. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a
