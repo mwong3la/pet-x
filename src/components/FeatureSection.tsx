@@ -1,11 +1,11 @@
-import Image from "next/image";
+import Image from "next/image"
 
 interface FeatureSectionProps {
-  title: string;
-  description: string;
-  imageUrl: string;
-  imageAlt: string;
-  reverse?: boolean;
+  title: string
+  description: string
+  imageUrl: string
+  imageAlt: string
+  reverse?: boolean
 }
 
 export default function FeatureSection({
@@ -16,34 +16,26 @@ export default function FeatureSection({
   reverse = false,
 }: FeatureSectionProps) {
   return (
-    <section className="py-24 lg:py-32 bg-white" id="features">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <section className="relative min-h-screen flex items-center justify-center bg-black">
+      <div className="w-full h-full relative">
+        {/* Full-screen background image */}
+        <div className="absolute inset-0">
+          <Image src={imageUrl || "/placeholder.svg"} alt={imageAlt} fill className="object-cover opacity-60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+        </div>
+
+        {/* Content overlay */}
         <div
-          className={`flex flex-col ${
-            reverse ? "lg:flex-row-reverse" : "lg:flex-row"
-          } items-center gap-12 lg:gap-20`}
+          className={`relative z-10 max-w-7xl mx-auto px-6 lg:px-12 min-h-screen flex items-center ${reverse ? "justify-end" : "justify-start"}`}
         >
-          <div className="flex-1 space-y-6">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-black leading-tight">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-white mb-6 leading-tight text-balance">
               {title}
             </h2>
-            <p className="text-xl text-gray-600 leading-relaxed max-w-xl">
-              {description}
-            </p>
-          </div>
-
-          <div className="flex-1 relative w-full">
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
-              <Image
-                src={imageUrl}
-                alt={imageAlt}
-                fill
-                className="object-cover"
-              />
-            </div>
+            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">{description}</p>
           </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

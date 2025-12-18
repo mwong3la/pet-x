@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 export default function TechSpecs() {
   const specs = [
     { label: "Dimensions", value: "42 × 36 × 12 mm" },
     { label: "Weight", value: "25 grams" },
-    { label: "Display", value: "0.96\" OLED" },
+    { label: "Display", value: '0.96" OLED' },
     { label: "Battery", value: "300 mAh lithium polymer" },
     { label: "Battery Life", value: "Up to 30 days" },
     { label: "Charging", value: "Magnetic USB charging" },
@@ -22,16 +24,14 @@ export default function TechSpecs() {
             Technical Specifications
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Premium engineering meets thoughtful design. Built to last, designed to impress.
+            Premium engineering meets thoughtful design. Built to last, designed
+            to impress.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 max-w-5xl mx-auto">
           {specs.map((spec, index) => (
-            <div
-              key={index}
-              className="border-b border-gray-800 pb-6"
-            >
+            <div key={index} className="border-b border-gray-800 pb-6">
               <dt className="text-sm text-gray-400 mb-2">{spec.label}</dt>
               <dd className="text-lg font-medium">{spec.value}</dd>
             </div>
@@ -39,9 +39,12 @@ export default function TechSpecs() {
         </div>
 
         <div className="mt-16 text-center">
-          <button className="bg-white text-black px-8 py-4 rounded-full text-base font-medium hover:bg-gray-200 transition-all hover:scale-105">
+          <Link
+            href="/specifications"
+            className="bg-white text-black px-8 py-4 rounded-full text-base font-medium hover:bg-gray-200 transition-all hover:scale-105"
+          >
             View Full Specifications
-          </button>
+          </Link>
         </div>
       </div>
     </section>

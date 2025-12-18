@@ -1,14 +1,13 @@
-import Hero from "@/components/Hero";
-import FeatureSection from "@/components/FeatureSection";
-import ProductShowcase from "@/components/ProductShowcase";
-import TechSpecs from "@/components/TechSpecs";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import FeatureSection from "@/components/FeatureSection"
+import ProductShowcase from "@/components/ProductShowcase"
+import TechSpecs from "@/components/TechSpecs"
+import Navigation from "@/components/Navigation"
+import Footer from "@/components/Footer"
+import Hero from "@/components/Hero"
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
-      <Navigation />
+    <div className="min-h-screen bg-black">
       <Hero />
       <FeatureSection
         title="Track. Monitor. Connect."
@@ -26,7 +25,6 @@ export default function Home() {
         reverse={true}
       />
       <TechSpecs />
-      <Footer />
     </div>
-  );
+  )
 }
