@@ -12,17 +12,17 @@ export default function Home() {
       <FeatureSection
         title="Track. Monitor. Connect."
         description="Keep your pet safe and healthy with real-time location tracking, activity monitoring, and health insights—all in one elegant device."
-        imageUrl="https://images.pexels.com/photos/406014/pexels-photo-406014.jpeg?auto=compress&cs=tinysrgb&w=1920"
         imageAlt="Smart pet collar"
         reverse={false}
+        preferredFolder="military"
       />
       <ProductShowcase />
       <FeatureSection
         title="Built for adventure."
         description="Waterproof, durable, and designed to withstand whatever your pet gets into. With up to 30 days of battery life."
-        imageUrl="https://images.pexels.com/photos/1254140/pexels-photo-1254140.jpeg?auto=compress&cs=tinysrgb&w=1920"
         imageAlt="Active dog wearing device"
         reverse={true}
+        preferredFolder="military"
       />
       <TechSpecs />
     </div>

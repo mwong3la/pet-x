@@ -1,20 +1,46 @@
+"use client"
+
 import Image from "next/image"
+import { getAllImages, getImagesByFolder } from "@/lib/imageUtils"
 
 export default function FeaturesPage() {
+  const allImages = getAllImages()
+  const militaryImages = getImagesByFolder("military")
+  const pearlImages = getImagesByFolder("pearl")
+  const aiImages = getImagesByFolder("ai")
+
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="pt-20 pb-16">
-        <div className="relative h-[60vh] mb-16 overflow-hidden">
-          <Image
-            src="/pet-wearing-smart-collar-active-outdoors-running-d.jpg"
-            alt="Features hero"
-            fill
-            className="object-cover brightness-50"
-          />
-          <div className="absolute inset-0 flex items-center justify-center text-center px-6">
-            <div>
-              <h1 className="text-6xl md:text-7xl font-light mb-4 text-balance">Features</h1>
-              <p className="text-xl md:text-2xl text-gray-300">Everything you need to keep your pet safe</p>
+        {/* Modern Hero Section */}
+        <div className="relative h-[70vh] min-h-[600px] mb-24 overflow-hidden">
+          <div className="absolute inset-0">
+            <Image
+              src={militaryImages[0]?.src || allImages[0]?.src || "/placeholder.svg"}
+              alt="Features hero"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+            <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/60" />
+          </div>
+          
+          <div className="relative z-10 h-full flex items-center">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 w-full">
+              <div className="max-w-3xl">
+                <div className="mb-6">
+                  <span className="text-xs tracking-[0.3em] uppercase text-gray-400">Features</span>
+                </div>
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-white mb-6 leading-[0.95] text-balance">
+                  Everything you need.
+                  <br />
+                  <span className="text-gray-300">Nothing you don&apos;t.</span>
+                </h1>
+                <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl">
+                  Advanced technology designed to keep your pet safe, healthy, and connected.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -24,7 +50,7 @@ export default function FeaturesPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="relative aspect-[4/3]">
                 <Image
-                  src="/smart-pet-collar-gps-tracker-close-up-detail-shot-.jpg"
+                  src={militaryImages[1]?.src || militaryImages[0]?.src || allImages[0]?.src || "/placeholder.svg"}
                   alt="GPS Tracking"
                   fill
                   className="object-cover rounded-2xl"
@@ -113,7 +139,7 @@ export default function FeaturesPage() {
               </div>
               <div className="order-1 lg:order-2 relative aspect-[4/3]">
                 <Image
-                  src="/pet-wearing-smart-collar-active-outdoors-running-d.jpg"
+                  src={pearlImages[0]?.src || pearlImages[1]?.src || allImages[0]?.src || "/placeholder.svg"}
                   alt="Activity Monitoring"
                   fill
                   className="object-cover rounded-2xl"
@@ -124,7 +150,7 @@ export default function FeaturesPage() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="relative aspect-[4/3]">
                 <Image
-                  src="/waterproof-smart-pet-collar-in-water-splash-photog.jpg"
+                  src={militaryImages[2]?.src || militaryImages[1]?.src || allImages[0]?.src || "/placeholder.svg"}
                   alt="Waterproof"
                   fill
                   className="object-cover rounded-2xl"
@@ -172,23 +198,41 @@ export default function FeaturesPage() {
             </div>
           </div>
 
-          <div className="mt-32 relative h-[70vh] rounded-2xl overflow-hidden">
-            <Image
-              src="/sleek-black-smart-pet-collar-on-pure-black-backgro.jpg"
-              alt="Finstinct Collar"
-              fill
-              className="object-contain"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-12 text-center">
-              <h2 className="text-4xl md:text-5xl font-light mb-4">Ready to experience Finstinct?</h2>
-              <p className="text-xl text-gray-400 mb-8">Join thousands of pet owners keeping their pets safe</p>
-              <a
-                href="/register"
-                className="inline-block bg-white text-black px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-200 transition-colors"
-              >
-                Pre-Order Now
-              </a>
+          {/* Modern CTA Section */}
+          <div className="mt-32 relative">
+            <div className="relative h-[75vh] min-h-[600px] overflow-hidden border border-gray-900 rounded-2xl">
+              <div className="absolute inset-0">
+                <Image
+                  src={pearlImages[2]?.src || pearlImages[1]?.src || allImages[0]?.src || "/placeholder.svg"}
+                  alt="Finstinct Collar"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/90" />
+                <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/60" />
+              </div>
+              
+              <div className="relative z-10 h-full flex items-center justify-center">
+                <div className="text-center px-6 max-w-3xl">
+                  <div className="mb-6">
+                    <span className="text-xs tracking-[0.3em] uppercase text-gray-400">Get Started</span>
+                  </div>
+                  <h2 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white mb-6 leading-[0.95] text-balance">
+                    Ready to experience
+                    <br />
+                    <span className="text-gray-300">Finstinct?</span>
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed max-w-2xl mx-auto">
+                    Join thousands of pet owners keeping their pets safe, healthy, and connected.
+                  </p>
+                  <a
+                    href="/register"
+                    className="inline-block bg-white text-black px-10 py-5 rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                  >
+                    Pre-Order Now
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
