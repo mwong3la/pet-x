@@ -3,6 +3,17 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useCreateOrder } from "@/lib/api/queries"
+import { useAuth } from "@/contexts/AuthContext"
+import { getImagesByFolder } from "@/lib/imageUtils"
+
+function getDefaultProductImage(id: number): string {
+  const militaryImages = getImagesByFolder("military")
+  const pearlImages = getImagesByFolder("pearl")
+  const allImages = [...militaryImages, ...pearlImages]
+  return allImages[id % allImages.length]?.src || "/military/1.png"
+}
 
 interface BagItem {
   id: string
@@ -10,18 +21,23 @@ interface BagItem {
   image: string
   price: number
   quantity: number
+  productId: number
   color?: string
   size?: string
 }
 
 export default function BagPage() {
+  const router = useRouter()
+  const { user, isAuthenticated } = useAuth()
+  const createOrderMutation = useCreateOrder()
   const [bagItems, setBagItems] = useState<BagItem[]>([
     {
       id: "1",
       name: "Finstinct Smart Collar",
-      image: "/sleek-black-smart-pet-collar-on-white-background-m.jpg",
+      image: getDefaultProductImage(1),
       price: 199,
       quantity: 1,
+      productId: 1,
       color: "Black",
       size: "Medium",
     },
@@ -34,6 +50,36 @@ export default function BagPage() {
 
   const removeItem = (id: string) => {
     setBagItems(bagItems.filter((item) => item.id !== id))
+  }
+
+  const handleCheckout = async () => {
+    if (!isAuthenticated || !user) {
+      router.push("/signin")
+      return
+    }
+
+    if (bagItems.length === 0) {
+      return
+    }
+
+    try {
+      const orderData = {
+        products: bagItems.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+        userId: user.id,
+      }
+
+      const order = await createOrderMutation.mutateAsync(orderData)
+      
+      // Clear bag and redirect to orders or payment
+      setBagItems([])
+      router.push(`/orders/${order.id}`)
+    } catch (error: any) {
+      console.error("Failed to create order:", error)
+      alert(error?.response?.data?.message || "Failed to create order. Please try again.")
+    }
   }
 
   const subtotal = bagItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -135,7 +181,7 @@ export default function BagPage() {
                               {item.color && <p className="text-sm text-gray-600 mt-1">Color: {item.color}</p>}
                               {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
                             </div>
-                            <p className="text-xl font-semibold text-black">£{item.price.toFixed(2)}</p>
+                            <p className="text-xl font-semibold text-black">${item.price.toFixed(2)}</p>
                           </div>
 
                           <div className="flex items-center gap-6 mt-4">
@@ -192,24 +238,28 @@ export default function BagPage() {
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Subtotal</span>
-                        <span className="font-medium text-black">£{subtotal.toFixed(2)}</span>
+                        <span className="font-medium text-black">${subtotal.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Shipping</span>
                         {/* <span className="font-medium text-black">
-                          {shipping === 0 ? "FREE" : `£${shipping.toFixed(2)}`}
+                          {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
                         </span> */}
                       </div>
                       <div className="pt-3 border-t border-gray-300">
                         <div className="flex justify-between">
                           <span className="text-lg font-semibold text-black">Total</span>
-                          <span className="text-lg font-semibold text-black">£{total.toFixed(2)}</span>
+                          <span className="text-lg font-semibold text-black">${total.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
 
-                    <button className="w-full bg-black text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors mb-3">
-                      Check Out
+                    <button 
+                      onClick={handleCheckout}
+                      disabled={bagItems.length === 0 || createOrderMutation.isPending || !isAuthenticated}
+                      className="w-full bg-black text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors mb-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {createOrderMutation.isPending ? "Processing..." : !isAuthenticated ? "Sign in to Checkout" : "Check Out"}
                     </button>
 
                     <Link href="/" className="block text-center text-black text-sm hover:underline">
@@ -232,7 +282,7 @@ export default function BagPage() {
                       </svg>
                       <div>
                         <p className="text-sm font-semibold text-black">Free Delivery</p>
-                        <p className="text-xs text-gray-600">On orders over £50</p>
+                        <p className="text-xs text-gray-600">On orders over $50</p>
                       </div>
                     </div>
 
