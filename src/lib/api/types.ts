@@ -4,6 +4,7 @@ export interface User {
   email: string;
   name: string;
   phone: string;
+  role?: number; // 1 = user, 2 = admin
 }
 
 export interface LoginRequest {

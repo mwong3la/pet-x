@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/lib/api/queries"
 import { useOrders, useUpdateOrderStatus } from "@/lib/api/queries"
 import { useAllPayments } from "@/lib/api/queries"
@@ -12,6 +14,9 @@ import type { Product } from "@/lib/api/types"
 type Tab = "products" | "orders" | "payments"
 
 export default function AdminDashboard() {
+  const router = useRouter()
+  const { isAuthenticated, isAdmin } = useAuth()
+  const [isChecking, setIsChecking] = useState(true)
   const [activeTab, setActiveTab] = useState<Tab>("products")
   const [isProductModalOpen, setIsProductModalOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
@@ -35,12 +40,80 @@ export default function AdminDashboard() {
   const deleteProductMutation = useDeleteProduct()
   const updateOrderStatusMutation = useUpdateOrderStatus()
 
+  // Protect admin route - check both localStorage and auth context
+  useEffect(() => {
+    // First check localStorage directly for immediate protection
+    if (typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user')
+      if (!storedUser) {
+        router.push("/")
+        return
+      }
+      
+      try {
+        const userData = JSON.parse(storedUser)
+        const userRole = userData.role
+        // Role 2 is admin, anything else should be redirected
+        if (userRole !== 2) {
+          router.push("/")
+          return
+        }
+      } catch (e) {
+        router.push("/")
+        return
+      }
+    }
+    
+    // Also verify with auth context once it's loaded
+    if (isAuthenticated && isAdmin) {
+      setIsChecking(false)
+    } else if (isAuthenticated && !isAdmin) {
+      // User is authenticated but not admin
+      router.push("/")
+    }
+    
+    // Fallback: if auth context takes too long, check localStorage again
+    const timeout = setTimeout(() => {
+      if (typeof window !== 'undefined') {
+        const storedUser = localStorage.getItem('user')
+        if (storedUser) {
+          try {
+            const userData = JSON.parse(storedUser)
+            if (userData.role === 2) {
+              setIsChecking(false)
+            } else {
+              router.push("/")
+            }
+          } catch (e) {
+            router.push("/")
+          }
+        } else {
+          router.push("/")
+        }
+      }
+    }, 500)
+    
+    return () => clearTimeout(timeout)
+  }, [isAuthenticated, isAdmin, router])
+
   const militaryImages = getImagesByFolder("military")
   const pearlImages = getImagesByFolder("pearl")
   const allImages = [...militaryImages, ...pearlImages]
 
   const getDefaultProductImage = (index: number): string => {
     return allImages[index % allImages.length]?.src || "/military/1.png"
+  }
+
+  // Show loading state while checking access
+  // Only show loading if we're still checking OR if we're authenticated but confirmed not admin
+  if (isChecking || (isAuthenticated && !isAdmin)) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   const handleOpenProductModal = (product?: Product) => {

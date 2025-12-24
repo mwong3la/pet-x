@@ -9,7 +9,7 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, isAdmin } = useAuth()
 
   const isHome = pathname === "/"
 
@@ -53,6 +53,11 @@ export default function Navigation() {
                 <Link href="/payment-history" className="text-sm text-gray-400 hover:text-white transition-colors">
                   Payments
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" className="text-sm text-gray-400 hover:text-white transition-colors">
+                    Admin Dashboard
+                  </Link>
+                )}
               </>
             )}
             <Link href="/bag" className="text-sm text-gray-400 hover:text-white transition-colors">
@@ -123,6 +128,11 @@ export default function Navigation() {
                 <Link href="/payment-history" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
                   Payments
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
+                    Admin Dashboard
+                  </Link>
+                )}
               </>
             )}
             <Link href="/bag" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
