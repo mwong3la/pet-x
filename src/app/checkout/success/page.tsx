@@ -17,11 +17,12 @@ function CheckoutSuccessContent() {
 
     const verifyPayment = async () => {
       try {
-        // Get session ID from localStorage or URL params
+        // Get session ID and order ID from localStorage or URL params
         const sessionId = localStorage.getItem('stripeSessionId') || searchParams.get('session_id')
-        const orderId = localStorage.getItem('orderId')
+        const orderIdStr = localStorage.getItem('orderId') || searchParams.get('orderId')
+        const orderId = orderIdStr ? parseInt(orderIdStr) : null
 
-        if (!sessionId) {
+        if (!sessionId || !orderId) {
           if (isMounted) {
             setVerificationStatus("error")
             setIsVerifying(false)
@@ -30,7 +31,7 @@ function CheckoutSuccessContent() {
         }
 
         // Verify payment with backend
-        await verifyPaymentMutation.mutateAsync(sessionId)
+        await verifyPaymentMutation.mutateAsync({ orderId, stripeSessionId: sessionId })
         
         if (isMounted) {
           setVerificationStatus("success")

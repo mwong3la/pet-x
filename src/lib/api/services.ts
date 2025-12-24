@@ -119,8 +119,11 @@ export const paymentApi = {
     return response.data;
   },
 
-  verifyPayment: async (stripeSessionId: string): Promise<any> => {
-    const response = await apiClient.put(`/api/Payment/${stripeSessionId}`);
+  verifyPayment: async (orderId: number, stripeSessionId: string): Promise<any> => {
+    const response = await apiClient.post('/api/Order/validate', {
+      orderId,
+      stripeSessionId,
+    });
     return response.data;
   },
 };
