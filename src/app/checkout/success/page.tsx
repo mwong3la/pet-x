@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useVerifyPayment } from "@/lib/api/queries"
 import Link from "next/link"
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const verifyPaymentMutation = useVerifyPayment()
@@ -149,6 +149,29 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-white">
+          <div className="pt-24 pb-16">
+            <div className="max-w-2xl mx-auto px-6">
+              <div className="text-center py-24">
+                <div className="mb-6">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                </div>
+                <h1 className="text-3xl font-semibold text-black mb-4">Loading...</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }
 
