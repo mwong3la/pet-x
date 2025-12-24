@@ -1,108 +1,113 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/AuthContext"
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/lib/api/queries"
-import { useOrders, useUpdateOrderStatus } from "@/lib/api/queries"
-import { useAllPayments } from "@/lib/api/queries"
-import { blobApi } from "@/lib/api/services"
-import Image from "next/image"
-import { getImagesByFolder } from "@/lib/imageUtils"
-import type { Product } from "@/lib/api/types"
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  useProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "@/lib/api/queries";
+import { useOrders, useUpdateOrderStatus } from "@/lib/api/queries";
+import { useAllPayments } from "@/lib/api/queries";
+import { blobApi } from "@/lib/api/services";
+import Image from "next/image";
+import { getImagesByFolder } from "@/lib/imageUtils";
+import type { Product } from "@/lib/api/types";
 
-type Tab = "products" | "orders" | "payments"
+type Tab = "products" | "orders" | "payments";
 
 export default function AdminDashboard() {
-  const router = useRouter()
-  const { isAuthenticated, isAdmin } = useAuth()
-  const [isChecking, setIsChecking] = useState(true)
-  const [activeTab, setActiveTab] = useState<Tab>("products")
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const router = useRouter();
+  const { isAuthenticated, isAdmin } = useAuth();
+  const [isChecking, setIsChecking] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>("products");
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productForm, setProductForm] = useState({
     name: "",
     description: "",
     price: "",
     image: "",
     deviceId: "",
-  })
-  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isUploadingImage, setIsUploadingImage] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  });
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: products = [], isLoading: productsLoading } = useProducts()
-  const { data: orders = [], isLoading: ordersLoading } = useOrders()
-  const { data: payments = [], isLoading: paymentsLoading } = useAllPayments()
-  const createProductMutation = useCreateProduct()
-  const updateProductMutation = useUpdateProduct()
-  const deleteProductMutation = useDeleteProduct()
-  const updateOrderStatusMutation = useUpdateOrderStatus()
+  const { data: products = [], isLoading: productsLoading } = useProducts();
+  const { data: orders = [], isLoading: ordersLoading } = useOrders();
+  const { data: payments = [], isLoading: paymentsLoading } = useAllPayments();
+  const createProductMutation = useCreateProduct();
+  const updateProductMutation = useUpdateProduct();
+  const deleteProductMutation = useDeleteProduct();
+  const updateOrderStatusMutation = useUpdateOrderStatus();
 
   // Protect admin route - check both localStorage and auth context
   useEffect(() => {
     // First check localStorage directly for immediate protection
-    if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('user')
+    if (typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("user");
       if (!storedUser) {
-        router.push("/")
-        return
+        router.push("/");
+        return;
       }
-      
+
       try {
-        const userData = JSON.parse(storedUser)
-        const userRole = userData.role
+        const userData = JSON.parse(storedUser);
+        const userRole = userData.role;
         // Role 2 is admin, anything else should be redirected
         if (userRole !== 2) {
-          router.push("/")
-          return
+          router.push("/");
+          return;
         }
       } catch (e) {
-        router.push("/")
-        return
+        router.push("/");
+        return;
       }
     }
-    
+
     // Also verify with auth context once it's loaded
     if (isAuthenticated && isAdmin) {
-      setIsChecking(false)
+      setIsChecking(false);
     } else if (isAuthenticated && !isAdmin) {
       // User is authenticated but not admin
-      router.push("/")
+      router.push("/");
     }
-    
+
     // Fallback: if auth context takes too long, check localStorage again
     const timeout = setTimeout(() => {
-      if (typeof window !== 'undefined') {
-        const storedUser = localStorage.getItem('user')
+      if (typeof window !== "undefined") {
+        const storedUser = localStorage.getItem("user");
         if (storedUser) {
           try {
-            const userData = JSON.parse(storedUser)
+            const userData = JSON.parse(storedUser);
             if (userData.role === 2) {
-              setIsChecking(false)
+              setIsChecking(false);
             } else {
-              router.push("/")
+              router.push("/");
             }
           } catch (e) {
-            router.push("/")
+            router.push("/");
           }
         } else {
-          router.push("/")
+          router.push("/");
         }
       }
-    }, 500)
-    
-    return () => clearTimeout(timeout)
-  }, [isAuthenticated, isAdmin, router])
+    }, 500);
 
-  const militaryImages = getImagesByFolder("military")
-  const pearlImages = getImagesByFolder("pearl")
-  const allImages = [...militaryImages, ...pearlImages]
+    return () => clearTimeout(timeout);
+  }, [isAuthenticated, isAdmin, router]);
+
+  const militaryImages = getImagesByFolder("military");
+  const pearlImages = getImagesByFolder("pearl");
+  const allImages = [...militaryImages, ...pearlImages];
 
   const getDefaultProductImage = (index: number): string => {
-    return allImages[index % allImages.length]?.src || "/military/1.png"
-  }
+    return allImages[index % allImages.length]?.src || "/military/1.png";
+  };
 
   // Show loading state while checking access
   // Only show loading if we're still checking OR if we're authenticated but confirmed not admin
@@ -113,76 +118,88 @@ export default function AdminDashboard() {
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   const handleOpenProductModal = (product?: Product) => {
     if (product) {
-      setEditingProduct(product)
+      setEditingProduct(product);
       setProductForm({
         name: product.name || "",
         description: product.description || "",
         price: product.price?.toString() || "",
         image: product.imageURL || product.image || "",
         deviceId: (product as any).deviceId || "",
-      })
-      setImagePreview(product.imageURL || product.image || null)
-      setSelectedImageFile(null)
+      });
+      setImagePreview(product.imageURL || product.image || null);
+      setSelectedImageFile(null);
     } else {
-      setEditingProduct(null)
-      setProductForm({ name: "", description: "", price: "", image: "", deviceId: "" })
-      setImagePreview(null)
-      setSelectedImageFile(null)
+      setEditingProduct(null);
+      setProductForm({
+        name: "",
+        description: "",
+        price: "",
+        image: "",
+        deviceId: "",
+      });
+      setImagePreview(null);
+      setSelectedImageFile(null);
     }
-    setIsProductModalOpen(true)
-  }
+    setIsProductModalOpen(true);
+  };
 
   const handleCloseProductModal = () => {
-    setIsProductModalOpen(false)
-    setEditingProduct(null)
-    setProductForm({ name: "", description: "", price: "", image: "", deviceId: "" })
-    setImagePreview(null)
-    setSelectedImageFile(null)
+    setIsProductModalOpen(false);
+    setEditingProduct(null);
+    setProductForm({
+      name: "",
+      description: "",
+      price: "",
+      image: "",
+      deviceId: "",
+    });
+    setImagePreview(null);
+    setSelectedImageFile(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setSelectedImageFile(file)
-      const reader = new FileReader()
+      setSelectedImageFile(file);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmitProduct = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      let imageURL = productForm.image
+      let imageURL = productForm.image;
 
       // If a new image file is selected, upload it first
       if (selectedImageFile) {
-        setIsUploadingImage(true)
+        setIsUploadingImage(true);
         try {
-          imageURL = await blobApi.uploadFile(selectedImageFile)
+          imageURL = await blobApi.uploadFile(selectedImageFile);
         } catch (uploadError) {
-          console.error("Failed to upload image:", uploadError)
-          alert("Failed to upload image. Please try again.")
-          setIsUploadingImage(false)
-          return
+          console.error("Failed to upload image:", uploadError);
+          alert("Failed to upload image. Please try again.");
+          setIsUploadingImage(false);
+          return;
         } finally {
-          setIsUploadingImage(false)
+          setIsUploadingImage(false);
         }
       }
 
       // If no image URL and no file selected, use default
       if (!imageURL) {
-        imageURL = getDefaultProductImage(products.length)
+        imageURL = getDefaultProductImage(products.length);
       }
 
       const productData = {
@@ -191,41 +208,47 @@ export default function AdminDashboard() {
         price: parseFloat(productForm.price),
         imageURL: imageURL,
         deviceId: productForm.deviceId || undefined,
-      }
+      };
 
       if (editingProduct) {
         await updateProductMutation.mutateAsync({
           id: editingProduct.id,
           data: productData,
-        })
+        });
       } else {
-        await createProductMutation.mutateAsync(productData)
+        await createProductMutation.mutateAsync(productData);
       }
-      handleCloseProductModal()
+      handleCloseProductModal();
     } catch (error) {
-      console.error("Failed to save product:", error)
-      alert("Failed to save product. Please try again.")
+      console.error("Failed to save product:", error);
+      alert("Failed to save product. Please try again.");
     }
-  }
+  };
 
   const handleDeleteProduct = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this product?")) return
+    if (!confirm("Are you sure you want to delete this product?")) return;
     try {
-      await deleteProductMutation.mutateAsync(id)
+      await deleteProductMutation.mutateAsync(id);
     } catch (error) {
-      console.error("Failed to delete product:", error)
-      alert("Failed to delete product. Please try again.")
+      console.error("Failed to delete product:", error);
+      alert("Failed to delete product. Please try again.");
     }
-  }
+  };
 
-  const handleUpdateOrderStatus = async (orderId: number, newStatus: number) => {
+  const handleUpdateOrderStatus = async (
+    orderId: number,
+    newStatus: number
+  ) => {
     try {
-      await updateOrderStatusMutation.mutateAsync({ orderId, orderStatus: newStatus })
+      await updateOrderStatusMutation.mutateAsync({
+        orderId,
+        orderStatus: newStatus,
+      });
     } catch (error) {
-      console.error("Failed to update order status:", error)
-      alert("Failed to update order status. Please try again.")
+      console.error("Failed to update order status:", error);
+      alert("Failed to update order status. Please try again.");
     }
-  }
+  };
 
   const getOrderStatusText = (status: number) => {
     const statusMap: Record<number, string> = {
@@ -238,9 +261,9 @@ export default function AdminDashboard() {
       7: "Refunded",
       8: "Failed",
       9: "Returned",
-    }
-    return statusMap[status] || "Unknown"
-  }
+    };
+    return statusMap[status] || "Unknown";
+  };
 
   const getOrderStatusColor = (status: number) => {
     const colorMap: Record<number, string> = {
@@ -253,23 +276,27 @@ export default function AdminDashboard() {
       7: "text-yellow-600 bg-yellow-50",
       8: "text-red-600 bg-red-50",
       9: "text-orange-600 bg-orange-50",
-    }
-    return colorMap[status] || "text-gray-600 bg-gray-50"
-  }
+    };
+    return colorMap[status] || "text-gray-600 bg-gray-50";
+  };
 
   const getPaymentStatusText = (status?: number) => {
-    if (status === 1) return "Not Paid"
-    if (status === 2) return "Paid"
-    return "Unknown"
-  }
+    if (status === 1) return "Not Paid";
+    if (status === 2) return "Paid";
+    return "Unknown";
+  };
 
   return (
     <div className="min-h-screen bg-white">
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-8">
-            <h1 className="text-5xl font-semibold text-black mb-2">Admin Dashboard</h1>
-            <p className="text-gray-600">Manage products, orders, and payments</p>
+            <h1 className="text-5xl font-semibold text-black mb-2">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-600">
+              Manage products, orders, and payments
+            </p>
           </div>
 
           {/* Tabs */}
@@ -294,7 +321,7 @@ export default function AdminDashboard() {
             >
               Orders
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab("payments")}
               className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === "payments"
@@ -303,7 +330,7 @@ export default function AdminDashboard() {
               }`}
             >
               Payments
-            </button>
+            </button> */}
           </div>
 
           {/* Products Tab */}
@@ -326,10 +353,17 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {products.map((product: Product) => (
-                    <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div
+                      key={product.id}
+                      className="border border-gray-200 rounded-lg overflow-hidden"
+                    >
                       <div className="aspect-square bg-gray-50 relative">
                         <Image
-                          src={product.imageURL || product.image || getDefaultProductImage(product.id)}
+                          src={
+                            product.imageURL ||
+                            product.image ||
+                            getDefaultProductImage(product.id)
+                          }
                           alt={product.name || `Product ${product.id}`}
                           fill
                           className="object-contain"
@@ -340,7 +374,9 @@ export default function AdminDashboard() {
                           {product.name || `Product ${product.id}`}
                         </h3>
                         {product.price !== undefined && (
-                          <p className="text-xl font-semibold text-black mb-3">${product.price.toFixed(2)}</p>
+                          <p className="text-xl font-semibold text-black mb-3">
+                            ${product.price.toFixed(2)}
+                          </p>
                         )}
                         <div className="flex gap-2">
                           <button
@@ -375,20 +411,38 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-4">
                   {orders.map((order: any) => (
-                    <div key={order.id} className="border border-gray-200 rounded-lg p-6">
+                    <div
+                      key={order.id}
+                      className="border border-gray-200 rounded-lg p-6"
+                    >
                       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-black">Order #{order.id}</h3>
-                          <p className="text-sm text-gray-600">User ID: {order.userId}</p>
-                          <p className="text-sm text-gray-600">Total: ${order.total.toFixed(2)}</p>
+                          <h3 className="text-lg font-semibold text-black">
+                            Order #{order.id}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            User ID: {order.userId}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Total: ${order.total.toFixed(2)}
+                          </p>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getOrderStatusColor(order.orderStatus)}`}>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getOrderStatusColor(
+                              order.orderStatus
+                            )}`}
+                          >
                             {getOrderStatusText(order.orderStatus)}
                           </span>
                           <select
                             value={order.orderStatus}
-                            onChange={(e) => handleUpdateOrderStatus(order.id, parseInt(e.target.value))}
+                            onChange={(e) =>
+                              handleUpdateOrderStatus(
+                                order.id,
+                                parseInt(e.target.value)
+                              )
+                            }
                             className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
                           >
                             <option value={1}>Pending</option>
@@ -404,9 +458,15 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <div className="text-sm text-gray-600">
-                        <p>Items: {(order.items || order.orderItems)?.length || 0}</p>
+                        <p>
+                          Items:{" "}
+                          {(order.items || order.orderItems)?.length || 0}
+                        </p>
                         {order.paymentStatus && (
-                          <p>Payment: {order.paymentStatus === 1 ? "Not Paid" : "Paid"}</p>
+                          <p>
+                            Payment:{" "}
+                            {order.paymentStatus === 1 ? "Not Paid" : "Paid"}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -419,7 +479,9 @@ export default function AdminDashboard() {
           {/* Payments Tab */}
           {activeTab === "payments" && (
             <div>
-              <h2 className="text-2xl font-semibold text-black mb-6">Payments</h2>
+              <h2 className="text-2xl font-semibold text-black mb-6">
+                Payments
+              </h2>
               {paymentsLoading ? (
                 <div className="text-center py-12">
                   <p className="text-gray-600">Loading payments...</p>
@@ -427,12 +489,21 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-4">
                   {payments.map((payment: any) => (
-                    <div key={payment.id} className="border border-gray-200 rounded-lg p-6">
+                    <div
+                      key={payment.id}
+                      className="border border-gray-200 rounded-lg p-6"
+                    >
                       <div className="flex flex-wrap items-center justify-between gap-4">
                         <div>
-                          <h3 className="text-lg font-semibold text-black">Payment #{payment.id}</h3>
-                          <p className="text-sm text-gray-600">User ID: {payment.userId}</p>
-                          <p className="text-sm text-gray-600">Amount: ${payment.amount?.toFixed(2) || "0.00"}</p>
+                          <h3 className="text-lg font-semibold text-black">
+                            Payment #{payment.id}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            User ID: {payment.userId}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Amount: ${payment.amount?.toFixed(2) || "0.00"}
+                          </p>
                           {payment.createdAt && (
                             <p className="text-xs text-gray-500 mt-1">
                               {new Date(payment.createdAt).toLocaleDateString()}
@@ -471,48 +542,81 @@ export default function AdminDashboard() {
                       onClick={handleCloseProductModal}
                       className="text-gray-600 hover:text-black"
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
 
                   <form onSubmit={handleSubmitProduct} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Name
+                      </label>
                       <input
                         type="text"
                         value={productForm.name}
-                        onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                        onChange={(e) =>
+                          setProductForm({
+                            ...productForm,
+                            name: e.target.value,
+                          })
+                        }
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Description
+                      </label>
                       <textarea
                         value={productForm.description}
-                        onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                        onChange={(e) =>
+                          setProductForm({
+                            ...productForm,
+                            description: e.target.value,
+                          })
+                        }
                         rows={4}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Price
+                      </label>
                       <input
                         type="number"
                         step="0.01"
                         value={productForm.price}
-                        onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                        onChange={(e) =>
+                          setProductForm({
+                            ...productForm,
+                            price: e.target.value,
+                          })
+                        }
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Image
+                      </label>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -534,15 +638,20 @@ export default function AdminDashboard() {
                         </div>
                       )}
                       <div className="mt-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Or enter Image URL:</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Or enter Image URL:
+                        </label>
                         <input
                           type="text"
                           value={productForm.image}
                           onChange={(e) => {
-                            setProductForm({ ...productForm, image: e.target.value })
+                            setProductForm({
+                              ...productForm,
+                              image: e.target.value,
+                            });
                             if (e.target.value) {
-                              setImagePreview(e.target.value)
-                              setSelectedImageFile(null)
+                              setImagePreview(e.target.value);
+                              setSelectedImageFile(null);
                             }
                           }}
                           placeholder="Enter image URL"
@@ -550,16 +659,25 @@ export default function AdminDashboard() {
                         />
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        {selectedImageFile ? "Image will be uploaded to blob storage" : "Leave empty for default image"}
+                        {selectedImageFile
+                          ? "Image will be uploaded to blob storage"
+                          : "Leave empty for default image"}
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Device ID (optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Device ID (optional)
+                      </label>
                       <input
                         type="text"
                         value={productForm.deviceId}
-                        onChange={(e) => setProductForm({ ...productForm, deviceId: e.target.value })}
+                        onChange={(e) =>
+                          setProductForm({
+                            ...productForm,
+                            deviceId: e.target.value,
+                          })
+                        }
                         placeholder="Enter device ID"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
@@ -568,12 +686,17 @@ export default function AdminDashboard() {
                     <div className="flex gap-4 pt-4">
                       <button
                         type="submit"
-                        disabled={createProductMutation.isPending || updateProductMutation.isPending || isUploadingImage}
+                        disabled={
+                          createProductMutation.isPending ||
+                          updateProductMutation.isPending ||
+                          isUploadingImage
+                        }
                         className="flex-1 bg-black text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
                       >
                         {isUploadingImage
                           ? "Uploading Image..."
-                          : createProductMutation.isPending || updateProductMutation.isPending
+                          : createProductMutation.isPending ||
+                            updateProductMutation.isPending
                           ? "Saving..."
                           : editingProduct
                           ? "Update Product"
@@ -595,6 +718,5 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
