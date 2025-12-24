@@ -153,7 +153,8 @@ export const useAllPayments = () => {
 export const useVerifyPayment = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (stripeSessionId: string) => paymentApi.verifyPayment(stripeSessionId),
+    mutationFn: ({ orderId, stripeSessionId }: { orderId: number; stripeSessionId: string }) =>
+      paymentApi.verifyPayment(orderId, stripeSessionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
       queryClient.invalidateQueries({ queryKey: ['allPayments'] });
