@@ -196,5 +196,9 @@ PUT /api/Order/status/{Id}
 PARAMETERS updatedStatus
 Available values : 1, 2, 3, 4, 5, 6, 7, 8, 9
 
-VERIFY PAYMENT
-PUT /api/Payment/{stripeSessionId}
+VALIDATE PAYMENT
+POST /api/Order/validate
+{
+  "orderId": 0,
+  "stripeSessionId": "string"
+}
