@@ -24,11 +24,9 @@ export default function SignInPage() {
 
     try {
       const response = await loginMutation.mutateAsync(formData)
-      console.log(response)
-      // Handle login response - adjust based on actual API response structure
+      // Handle login response - store full response object with token and userId
       if (response) {
-        const user = response.user || response
-        login(user, response.token)
+        login(response)
         router.push("/")
       } else {
         throw new Error("Invalid response from server")

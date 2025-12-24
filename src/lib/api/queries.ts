@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userApi, productApi, orderApi, paymentApi } from './services';
+import { userApi, productApi, orderApi, paymentApi, blobApi } from './services';
 import type {
   LoginRequest,
   RegisterRequest,
@@ -147,6 +147,18 @@ export const useAllPayments = () => {
   return useQuery({
     queryKey: ['allPayments'],
     queryFn: () => paymentApi.getAllPayments(),
+  });
+};
+
+export const useVerifyPayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (stripeSessionId: string) => paymentApi.verifyPayment(stripeSessionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['paymentHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['allPayments'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 };
 
