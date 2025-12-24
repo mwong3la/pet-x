@@ -7,6 +7,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   userId: number | null;
+  role: number | null;
+  isAdmin: boolean;
   login: (userData: any) => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -18,6 +20,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
+  const [role, setRole] = useState<number | null>(null);
 
   useEffect(() => {
     // Load user object from localStorage on mount
@@ -29,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const userData = JSON.parse(storedUser);
           setUser(userData);
           
-          // Extract token and userId from stored user object
+          // Extract token, userId, and role from stored user object
           if (userData.token) {
             setToken(userData.token);
           }
@@ -37,6 +40,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUserId(userData.userId);
           } else if (userData.id) {
             setUserId(userData.id);
+          }
+          if (userData.role !== undefined) {
+            setRole(userData.role);
           }
         } catch (e) {
           console.error('Failed to parse stored user:', e);
@@ -46,16 +52,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (userData: any) => {
-    // Store the full user object with token and userId
+    // Store the full user object with token, userId, and role
     const userObject = {
       ...userData,
       token: userData.token,
       userId: userData.userId || userData.id,
+      role: userData.role,
     };
     
     setUser(userObject);
     setToken(userObject.token);
     setUserId(userObject.userId || userObject.id);
+    setRole(userObject.role || null);
     
     if (typeof window !== 'undefined') {
       localStorage.setItem('user', JSON.stringify(userObject));
@@ -66,6 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setToken(null);
     setUserId(null);
+    setRole(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
     }
@@ -77,6 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         token,
         userId,
+        role,
+        isAdmin: role === 2,
         login,
         logout,
         isAuthenticated: !!user,
