@@ -4,10 +4,19 @@ import { usePaymentHistory, useMakePayment } from "@/lib/api/queries"
 import { useAuth } from "@/contexts/AuthContext"
 import Link from "next/link"
 import { PaymentHistorySkeleton } from "@/components/loading-skeletons"
+import { useEffect, useState } from "react"
+import { getUserIdFromStorage } from "@/lib/userUtils"
 
 export default function PaymentHistoryPage() {
-  const { user, isAuthenticated } = useAuth()
-  const { data: payments = [], isLoading, error } = usePaymentHistory(user?.id || null)
+  const { user, userId, isAuthenticated } = useAuth()
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  
+  useEffect(() => {
+    const id = userId || user?.id || getUserIdFromStorage()
+    setCurrentUserId(id)
+  }, [userId, user])
+  
+  const { data: payments = [], isLoading, error } = usePaymentHistory(currentUserId)
   const makePaymentMutation = useMakePayment()
 
   if (!isAuthenticated) {

@@ -1,56 +1,20 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useCreateOrder } from "@/lib/api/queries"
 import { useAuth } from "@/contexts/AuthContext"
-import { getImagesByFolder } from "@/lib/imageUtils"
-
-function getDefaultProductImage(id: number): string {
-  const militaryImages = getImagesByFolder("military")
-  const pearlImages = getImagesByFolder("pearl")
-  const allImages = [...militaryImages, ...pearlImages]
-  return allImages[id % allImages.length]?.src || "/military/1.png"
-}
-
-interface BagItem {
-  id: string
-  name: string
-  image: string
-  price: number
-  quantity: number
-  productId: number
-  color?: string
-  size?: string
-}
+import { useCart } from "@/contexts/CartContext"
+import { getUserIdFromStorage } from "@/lib/userUtils"
 
 export default function BagPage() {
   const router = useRouter()
-  const { user, isAuthenticated } = useAuth()
+  const { user, userId, isAuthenticated } = useAuth()
+  const { items, updateQuantity, removeItem, clearCart, getTotalPrice } = useCart()
   const createOrderMutation = useCreateOrder()
-  const [bagItems, setBagItems] = useState<BagItem[]>([
-    {
-      id: "1",
-      name: "Finstinct Smart Collar",
-      image: getDefaultProductImage(1),
-      price: 199,
-      quantity: 1,
-      productId: 1,
-      color: "Black",
-      size: "Medium",
-    },
-  ])
 
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity < 1) return
-    setBagItems(bagItems.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
-  }
-
-  const removeItem = (id: string) => {
-    setBagItems(bagItems.filter((item) => item.id !== id))
-  }
+  const bagItems = items.filter((item) => item.product) // Only show items with product data
 
   const handleCheckout = async () => {
     if (!isAuthenticated || !user) {
@@ -63,18 +27,25 @@ export default function BagPage() {
     }
 
     try {
+      const currentUserId = userId || user?.id || getUserIdFromStorage()
+      if (!currentUserId) {
+        alert("User ID not found. Please sign in again.")
+        router.push("/signin")
+        return
+      }
+
       const orderData = {
         products: bagItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
         })),
-        userId: user.id,
+        userId: currentUserId,
       }
 
       const order = await createOrderMutation.mutateAsync(orderData)
       
       // Clear bag and redirect to orders or payment
-      setBagItems([])
+      clearCart()
       router.push(`/orders/${order.id}`)
     } catch (error: any) {
       console.error("Failed to create order:", error)
@@ -82,7 +53,7 @@ export default function BagPage() {
     }
   }
 
-  const subtotal = bagItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const subtotal = getTotalPrice()
   const shipping = subtotal > 0 ? 0 : 0
   const total = subtotal + shipping
 
@@ -108,14 +79,8 @@ export default function BagPage() {
             </div>
           ) : (
             <>
-              <div className="flex items-center justify-between mb-8">
+              <div className="mb-8">
                 <h1 className="text-5xl font-semibold text-black">Bag</h1>
-                <Link
-                  href="/checkout"
-                  className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors"
-                >
-                  Review Bag
-                </Link>
               </div>
 
               <div className="flex flex-col lg:flex-row gap-12">
@@ -161,76 +126,88 @@ export default function BagPage() {
                 </div>
 
                 <div className="flex-1">
-                  {bagItems.map((item) => (
-                    <div key={item.id} className="pb-6 mb-6 border-b border-gray-200">
-                      <div className="flex gap-6">
-                        <div className="flex-shrink-0 w-32 h-32 bg-gray-50 rounded-lg overflow-hidden">
-                          <Image
-                            src={item.image || "/placeholder.svg"}
-                            alt={item.name}
-                            width={128}
-                            height={128}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="text-xl font-semibold text-black">{item.name}</h3>
-                              {item.color && <p className="text-sm text-gray-600 mt-1">Color: {item.color}</p>}
-                              {item.size && <p className="text-sm text-gray-600">Size: {item.size}</p>}
-                            </div>
-                            <p className="text-xl font-semibold text-black">${item.price.toFixed(2)}</p>
+                  {bagItems.map((item) => {
+                    const product = item.product!
+                    const imageURL = product.imageURL || product.image || "/placeholder.svg"
+                    const price = product.price || 0
+                    
+                    return (
+                      <div key={item.productId} className="pb-6 mb-6 border-b border-gray-200">
+                        <div className="flex gap-6">
+                          <div className="flex-shrink-0 w-32 h-32 bg-gray-50 rounded-lg overflow-hidden">
+                            <Image
+                              src={imageURL}
+                              alt={product.name || `Product ${product.id}`}
+                              width={128}
+                              height={128}
+                              className="w-full h-full object-contain"
+                            />
                           </div>
 
-                          <div className="flex items-center gap-6 mt-4">
-                            <div className="flex items-center gap-3">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors"
-                                aria-label="Decrease quantity"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path d="M20 12H4" />
-                                </svg>
-                              </button>
-                              <span className="text-sm font-medium text-black w-8 text-center">{item.quantity}</span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors"
-                                aria-label="Increase quantity"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path d="M12 4v16m8-8H4" />
-                                </svg>
-                              </button>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h3 className="text-xl font-semibold text-black">
+                                  {product.name || `Product ${product.id}`}
+                                </h3>
+                                {product.description && (
+                                  <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
+                                )}
+                              </div>
+                              <p className="text-xl font-semibold text-black">${price.toFixed(2)}</p>
                             </div>
 
-                            <button onClick={() => removeItem(item.id)} className="text-black text-sm hover:underline">
-                              Remove
-                            </button>
+                            <div className="flex items-center gap-6 mt-4">
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors"
+                                  aria-label="Decrease quantity"
+                                >
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path d="M20 12H4" />
+                                  </svg>
+                                </button>
+                                <span className="text-sm font-medium text-black w-8 text-center">{item.quantity}</span>
+                                <button
+                                  onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                  className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors"
+                                  aria-label="Increase quantity"
+                                >
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path d="M12 4v16m8-8H4" />
+                                  </svg>
+                                </button>
+                              </div>
+
+                              <button
+                                onClick={() => removeItem(item.productId)}
+                                className="text-black text-sm hover:underline"
+                              >
+                                Remove
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
 
                 <div className="lg:w-[340px]">

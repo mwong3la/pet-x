@@ -87,6 +87,7 @@ export interface CreateProductRequest {
   price: number;
   image?: string; // Legacy
   imageURL?: string; // New field
+  deviceId?: string;
   [key: string]: any;
 }
 
@@ -96,6 +97,7 @@ export interface UpdateProductRequest {
   price?: number;
   image?: string; // Legacy
   imageURL?: string; // New field
+  deviceId?: string;
   [key: string]: any;
 }
 

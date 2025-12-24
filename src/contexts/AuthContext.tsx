@@ -6,7 +6,8 @@ import type { User } from '@/lib/api/types';
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (user: any, token?: string) => void;
+  userId: number | null;
+  login: (userData: any) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -16,46 +17,57 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Load user and token from localStorage on mount
+    // Load user object from localStorage on mount
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
-      const storedToken = localStorage.getItem('authToken');
       
       if (storedUser) {
         try {
-          setUser(JSON.parse(storedUser));
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          
+          // Extract token and userId from stored user object
+          if (userData.token) {
+            setToken(userData.token);
+          }
+          if (userData.userId) {
+            setUserId(userData.userId);
+          } else if (userData.id) {
+            setUserId(userData.id);
+          }
         } catch (e) {
           console.error('Failed to parse stored user:', e);
         }
       }
-      
-      if (storedToken) {
-        setToken(storedToken);
-      }
     }
   }, []);
 
-  const login = (userData: User, authToken?: string) => {
-    setUser(userData);
-    if (authToken) {
-      setToken(authToken);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authToken', authToken);
-      }
-    }
+  const login = (userData: any) => {
+    // Store the full user object with token and userId
+    const userObject = {
+      ...userData,
+      token: userData.token,
+      userId: userData.userId || userData.id,
+    };
+    
+    setUser(userObject);
+    setToken(userObject.token);
+    setUserId(userObject.userId || userObject.id);
+    
     if (typeof window !== 'undefined') {
-      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user', JSON.stringify(userObject));
     }
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
+    setUserId(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('user');
-      localStorage.removeItem('authToken');
     }
   };
 
@@ -64,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         token,
+        userId,
         login,
         logout,
         isAuthenticated: !!user,

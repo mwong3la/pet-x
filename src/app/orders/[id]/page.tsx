@@ -8,6 +8,7 @@ import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { OrderDetailSkeleton } from "@/components/loading-skeletons"
 import { getImagesByFolder } from "@/lib/imageUtils"
+import { getUserIdFromStorage } from "@/lib/userUtils"
 
 function getDefaultProductImage(id: number): string {
   const militaryImages = getImagesByFolder("military")
@@ -19,7 +20,7 @@ function getDefaultProductImage(id: number): string {
 export default function OrderDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { user, isAuthenticated } = useAuth()
+  const { user, userId, isAuthenticated } = useAuth()
   const orderId = params?.id ? parseInt(params.id as string) : null
   const { data: order, isLoading, error } = useOrder(orderId)
   const payForOrderMutation = usePayForOrder()
@@ -33,17 +34,31 @@ export default function OrderDetailPage() {
 
     setIsProcessingPayment(true)
     try {
+      const currentUserId = userId || user?.id || getUserIdFromStorage()
+      if (!currentUserId) {
+        alert("User ID not found. Please sign in again.")
+        router.push("/signin")
+        return
+      }
+
       const paymentData = {
-        userId: user.id,
+        userId: currentUserId,
         amount: order.total || 0,
-        successURL: `${window.location.origin}/orders/${order.id}?payment=success`,
-        cancelURL: `${window.location.origin}/orders/${order.id}?payment=cancelled`,
+        successURL: `${window.location.origin}/checkout/success`,
+        cancelURL: `${window.location.origin}/checkout/cancel`,
       }
 
       const result = await payForOrderMutation.mutateAsync({
         orderId: order.id,
         data: paymentData,
       })
+      // Save session ID to localStorage before redirecting
+      if (result.stripeSessioId      ) {
+        const sessionId = result.stripeSessioId
+
+        localStorage.setItem('stripeSessionId', sessionId)
+        localStorage.setItem('orderId', order.id.toString())
+      }
 
       // If the API returns a payment URL, redirect to it
       if (result.url || result.paymentUrl) {

@@ -2,6 +2,7 @@
 
 import { useProduct } from "@/lib/api/queries"
 import { useAuth } from "@/contexts/AuthContext"
+import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -21,6 +22,7 @@ export default function ProductDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { user, isAuthenticated } = useAuth()
+  const { addItem } = useCart()
   const productId = params?.id ? parseInt(params.id as string) : null
   const { data: product, isLoading, error } = useProduct(productId)
   const [quantity, setQuantity] = useState(1)
@@ -61,8 +63,8 @@ export default function ProductDetailPage() {
   }
 
   const handleAddToBag = () => {
-    // In a real app, you'd add to a cart/bag context or localStorage
-    // For now, redirect to bag page
+    if (!product) return
+    addItem(product, quantity)
     router.push("/bag")
   }
 

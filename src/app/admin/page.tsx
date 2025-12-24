@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/lib/api/queries"
 import { useOrders, useUpdateOrderStatus } from "@/lib/api/queries"
 import { useAllPayments } from "@/lib/api/queries"
+import { blobApi } from "@/lib/api/services"
 import Image from "next/image"
 import { getImagesByFolder } from "@/lib/imageUtils"
 import type { Product } from "@/lib/api/types"
@@ -19,7 +20,12 @@ export default function AdminDashboard() {
     description: "",
     price: "",
     image: "",
+    deviceId: "",
   })
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: products = [], isLoading: productsLoading } = useProducts()
   const { data: orders = [], isLoading: ordersLoading } = useOrders()
@@ -45,10 +51,15 @@ export default function AdminDashboard() {
         description: product.description || "",
         price: product.price?.toString() || "",
         image: product.imageURL || product.image || "",
+        deviceId: (product as any).deviceId || "",
       })
+      setImagePreview(product.imageURL || product.image || null)
+      setSelectedImageFile(null)
     } else {
       setEditingProduct(null)
-      setProductForm({ name: "", description: "", price: "", image: "" })
+      setProductForm({ name: "", description: "", price: "", image: "", deviceId: "" })
+      setImagePreview(null)
+      setSelectedImageFile(null)
     }
     setIsProductModalOpen(true)
   }
@@ -56,18 +67,57 @@ export default function AdminDashboard() {
   const handleCloseProductModal = () => {
     setIsProductModalOpen(false)
     setEditingProduct(null)
-    setProductForm({ name: "", description: "", price: "", image: "" })
+    setProductForm({ name: "", description: "", price: "", image: "", deviceId: "" })
+    setImagePreview(null)
+    setSelectedImageFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedImageFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const handleSubmitProduct = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      let imageURL = productForm.image
+
+      // If a new image file is selected, upload it first
+      if (selectedImageFile) {
+        setIsUploadingImage(true)
+        try {
+          imageURL = await blobApi.uploadFile(selectedImageFile)
+        } catch (uploadError) {
+          console.error("Failed to upload image:", uploadError)
+          alert("Failed to upload image. Please try again.")
+          setIsUploadingImage(false)
+          return
+        } finally {
+          setIsUploadingImage(false)
+        }
+      }
+
+      // If no image URL and no file selected, use default
+      if (!imageURL) {
+        imageURL = getDefaultProductImage(products.length)
+      }
+
       const productData = {
         name: productForm.name,
         description: productForm.description,
         price: parseFloat(productForm.price),
-        imageURL: productForm.image || getDefaultProductImage(products.length),
-        image: productForm.image || getDefaultProductImage(products.length), // Legacy support
+        imageURL: imageURL,
+        deviceId: productForm.deviceId || undefined,
       }
 
       if (editingProduct) {
@@ -389,24 +439,68 @@ export default function AdminDashboard() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Image URL (optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Image</label>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black mb-2"
+                      />
+                      {imagePreview && (
+                        <div className="mt-4 mb-4">
+                          <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                          <div className="relative w-full h-48 bg-gray-50 rounded-lg overflow-hidden">
+                            <Image
+                              src={imagePreview}
+                              alt="Preview"
+                              fill
+                              className="object-contain"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <div className="mt-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Or enter Image URL:</label>
+                        <input
+                          type="text"
+                          value={productForm.image}
+                          onChange={(e) => {
+                            setProductForm({ ...productForm, image: e.target.value })
+                            if (e.target.value) {
+                              setImagePreview(e.target.value)
+                              setSelectedImageFile(null)
+                            }
+                          }}
+                          placeholder="Enter image URL"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {selectedImageFile ? "Image will be uploaded to blob storage" : "Leave empty for default image"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Device ID (optional)</label>
                       <input
                         type="text"
-                        value={productForm.image}
-                        onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                        placeholder="Enter image URL or leave empty for default image"
+                        value={productForm.deviceId}
+                        onChange={(e) => setProductForm({ ...productForm, deviceId: e.target.value })}
+                        placeholder="Enter device ID"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                       />
-                      <p className="text-xs text-gray-500 mt-1">This will be saved as imageURL in the backend</p>
                     </div>
 
                     <div className="flex gap-4 pt-4">
                       <button
                         type="submit"
-                        disabled={createProductMutation.isPending || updateProductMutation.isPending}
+                        disabled={createProductMutation.isPending || updateProductMutation.isPending || isUploadingImage}
                         className="flex-1 bg-black text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
                       >
-                        {createProductMutation.isPending || updateProductMutation.isPending
+                        {isUploadingImage
+                          ? "Uploading Image..."
+                          : createProductMutation.isPending || updateProductMutation.isPending
                           ? "Saving..."
                           : editingProduct
                           ? "Update Product"
