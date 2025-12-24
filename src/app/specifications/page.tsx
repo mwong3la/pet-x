@@ -1,187 +1,241 @@
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
+import { getImagesByFolder } from "@/lib/imageUtils"
 
 export default function SpecificationsPage() {
+  const militaryImages = getImagesByFolder("military")
+  const pearlImages = getImagesByFolder("pearl")
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="pt-24 pb-16">
-        {/* Hero section with product image */}
-        <div className="max-w-[1400px] mx-auto px-6 mb-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-square">
-              <Image
-                src="/sleek-black-smart-pet-collar-on-pure-black-backgro.jpg"
-                alt="Finstinct Smart Collar"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div>
-              <h1 className="text-6xl font-light mb-6 text-balance">Technical Specifications</h1>
-              <p className="text-xl text-gray-400 mb-8">Engineered for performance. Designed for comfort.</p>
-              <Link
-                href="/"
-                className="inline-block bg-white text-black px-8 py-3 rounded-full font-medium hover:bg-gray-200 transition-colors"
-              >
-                Pre-Order Now
-              </Link>
+      <div className="pt-20 pb-16">
+        {/* Modern Hero Section */}
+        <div className="relative h-[70vh] min-h-[600px] mb-24 overflow-hidden">
+          <div className="absolute inset-0">
+            <Image
+              src={militaryImages[0]?.src || "/military/1.png"}
+              alt="Specifications hero"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+            <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/60" />
+          </div>
+          
+          <div className="relative z-10 h-full flex items-center">
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-12 w-full">
+              <div className="max-w-3xl">
+                <div className="mb-6">
+                  <span className="text-xs tracking-[0.3em] uppercase text-gray-400">Specifications</span>
+                </div>
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-light tracking-tight text-white mb-6 leading-[0.95] text-balance">
+                  Technical
+                  <br />
+                  <span className="text-gray-300">Specifications</span>
+                </h1>
+                <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl">
+                  Engineered for performance. Designed for comfort. Built to last.
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Specifications grid */}
-        <div className="max-w-[980px] mx-auto px-6">
-          <div className="space-y-12">
-            {/* Design & Build */}
-            <div>
-              <h2 className="text-3xl font-light mb-6 pb-3 border-b border-gray-800">Design & Build</h2>
-              <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Dimensions</span>
-                  <span className="text-white">45 × 32 × 12 mm</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Weight</span>
-                  <span className="text-white">28g</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Materials</span>
-                  <span className="text-white">Aerospace aluminum, TPU</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Colors</span>
-                  <span className="text-white">Midnight Black</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Water Resistance</span>
-                  <span className="text-white">IP68 (up to 1.5m for 30 min)</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Strap</span>
-                  <span className="text-white">Adjustable nylon, 20-60cm</span>
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="space-y-32">
+            {/* Design & Build Section */}
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={militaryImages[1]?.src || militaryImages[0]?.src || "/military/2.png"}
+                  alt="Design & Build"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
+              <div>
+                <h2 className="text-5xl font-light mb-8 text-balance">Design & Build</h2>
+                <div className="space-y-6">
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Dimensions</span>
+                    <span className="text-white text-lg font-light">45 × 32 × 12 mm</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Weight</span>
+                    <span className="text-white text-lg font-light">28g</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Materials</span>
+                    <span className="text-white text-lg font-light">Aerospace aluminum, TPU</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Colors</span>
+                    <span className="text-white text-lg font-light">Midnight Black</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Water Resistance</span>
+                    <span className="text-white text-lg font-light">IP68 (up to 1.5m for 30 min)</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Strap</span>
+                    <span className="text-white text-lg font-light">Adjustable nylon, 20-60cm</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Performance */}
-            <div>
-              <h2 className="text-3xl font-light mb-6 pb-3 border-b border-gray-800">Performance</h2>
-              <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">GPS Accuracy</span>
-                  <span className="text-white">5-10m</span>
+            {/* Performance Section */}
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+              <div>
+                <h2 className="text-5xl font-light mb-8 text-balance">Performance</h2>
+                <div className="space-y-6">
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">GPS Accuracy</span>
+                    <span className="text-white text-lg font-light">5-10m</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Update Frequency</span>
+                    <span className="text-white text-lg font-light">Every 30 seconds</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Battery Life</span>
+                    <span className="text-white text-lg font-light">Up to 30 days</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Charging Time</span>
+                    <span className="text-white text-lg font-light">2 hours (USB-C)</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Operating Temp</span>
+                    <span className="text-white text-lg font-light">-10°C to 50°C</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Connectivity</span>
+                    <span className="text-white text-lg font-light">LTE-M, NB-IoT, Bluetooth 5.0</span>
+                  </div>
                 </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Update Frequency</span>
-                  <span className="text-white">Every 30 seconds</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Battery Life</span>
-                  <span className="text-white">Up to 30 days</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Charging Time</span>
-                  <span className="text-white">2 hours (USB-C)</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Operating Temp</span>
-                  <span className="text-white">-10°C to 50°C</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Connectivity</span>
-                  <span className="text-white">LTE-M, NB-IoT, Bluetooth 5.0</span>
+              </div>
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={pearlImages[0]?.src || pearlImages[1]?.src || "/pearl/1.png"}
+                  alt="Performance"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
+            </div>
+
+            {/* Sensors Section */}
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={militaryImages[2]?.src || militaryImages[3]?.src || "/military/3.png"}
+                  alt="Sensors"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
+              <div>
+                <h2 className="text-5xl font-light mb-8 text-balance">Sensors</h2>
+                <div className="space-y-6">
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">GPS</span>
+                    <span className="text-white text-lg font-light">GPS, GLONASS, Galileo</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Accelerometer</span>
+                    <span className="text-white text-lg font-light">3-axis, 16-bit</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Gyroscope</span>
+                    <span className="text-white text-lg font-light">3-axis</span>
+                  </div>
+                  <div className="flex justify-between py-4 border-b border-gray-800">
+                    <span className="text-gray-400 text-lg">Temperature</span>
+                    <span className="text-white text-lg font-light">±0.5°C accuracy</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Sensors */}
-            <div>
-              <h2 className="text-3xl font-light mb-6 pb-3 border-b border-gray-800">Sensors</h2>
-              <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">GPS</span>
-                  <span className="text-white">GPS, GLONASS, Galileo</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Accelerometer</span>
-                  <span className="text-white">3-axis, 16-bit</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Gyroscope</span>
-                  <span className="text-white">3-axis</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-gray-900">
-                  <span className="text-gray-400">Temperature</span>
-                  <span className="text-white">±0.5°C accuracy</span>
-                </div>
+            {/* In the Box Section */}
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+              <div>
+                <h2 className="text-5xl font-light mb-8 text-balance">In the Box</h2>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-4 text-gray-300 text-lg">
+                    <svg className="w-6 h-6 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Finstinct Smart Collar
+                  </li>
+                  <li className="flex items-center gap-4 text-gray-300 text-lg">
+                    <svg className="w-6 h-6 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    USB-C Charging Cable
+                  </li>
+                  <li className="flex items-center gap-4 text-gray-300 text-lg">
+                    <svg className="w-6 h-6 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Quick Start Guide
+                  </li>
+                  <li className="flex items-center gap-4 text-gray-300 text-lg">
+                    <svg className="w-6 h-6 text-white flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    1 Year Premium Subscription
+                  </li>
+                </ul>
+              </div>
+              <div className="relative aspect-[4/3]">
+                <Image
+                  src={pearlImages[2]?.src || pearlImages[3]?.src || "/pearl/3.png"}
+                  alt="In the Box"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
               </div>
             </div>
 
-            {/* In the Box */}
-            <div>
-              <h2 className="text-3xl font-light mb-6 pb-3 border-b border-gray-800">In the Box</h2>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Finstinct Smart Collar
-                </li>
-                <li className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  USB-C Charging Cable
-                </li>
-                <li className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Quick Start Guide
-                </li>
-                <li className="flex items-center gap-3 text-gray-300">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  1 Year Premium Subscription
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Large product showcase */}
-          <div className="mt-16 grid md:grid-cols-2 gap-4">
-            <div className="relative aspect-square">
-              <Image
-                src="/smart-pet-collar-gps-tracker-close-up-detail-shot-.jpg"
-                alt="Detail shot"
-                fill
-                className="object-cover rounded-lg"
-              />
-            </div>
-            <div className="relative aspect-square">
-              <Image
-                src="/pet-wearing-smart-collar-active-outdoors-running-d.jpg"
-                alt="In action"
-                fill
-                className="object-cover rounded-lg"
-              />
+            {/* Large product showcase */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="relative aspect-square">
+                <Image
+                  src={militaryImages[4]?.src || militaryImages[5]?.src || "/military/5.png"}
+                  alt="Detail shot"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
+              <div className="relative aspect-square">
+                <Image
+                  src={pearlImages[3]?.src || pearlImages[0]?.src || "/pearl/4.png"}
+                  alt="In action"
+                  fill
+                  className="object-cover rounded-2xl"
+                />
+              </div>
             </div>
           </div>
         </div>

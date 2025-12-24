@@ -2,13 +2,22 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const { user, isAuthenticated, logout } = useAuth()
 
   const isHome = pathname === "/"
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
+    setIsMenuOpen(false)
+  }
   return (
        <nav
       className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-xl border-b border-white/5 transition-colors
@@ -26,28 +35,52 @@ export default function Navigation() {
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-12">
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/products" className="text-sm text-gray-400 hover:text-white transition-colors">
+              Products
+            </Link>
             <Link href="/features" className="text-sm text-gray-400 hover:text-white transition-colors">
               Features
             </Link>
             <Link href="/support" className="text-sm text-gray-400 hover:text-white transition-colors">
               Support
             </Link>
-            {/* <Link href="/orders" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Orders
-            </Link> */}
+            {isAuthenticated && (
+              <>
+                <Link href="/orders" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Orders
+                </Link>
+                <Link href="/payment-history" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Payments
+                </Link>
+              </>
+            )}
             <Link href="/bag" className="text-sm text-gray-400 hover:text-white transition-colors">
               Bag
             </Link>
-            {/* <Link href="/signin" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Sign In
-            </Link> */}
-            <Link
-              href="/register"
-              className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
-            >
-              Pre-Order
-            </Link>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-400">{user?.name || user?.email}</span>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/signin" className="text-sm text-gray-400 hover:text-white transition-colors">
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-white text-black px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Pre-Order
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -73,27 +106,54 @@ export default function Navigation() {
       {isMenuOpen && (
         <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/5">
           <div className="px-6 py-6 space-y-4">
-            <Link href="/features" className="block text-sm text-gray-400 hover:text-white">
+            <Link href="/products" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
+              Products
+            </Link>
+            <Link href="/features" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
               Features
             </Link>
-            <Link href="/support" className="block text-sm text-gray-400 hover:text-white">
+            <Link href="/support" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
               Support
             </Link>
-            <Link href="/orders" className="block text-sm text-gray-400 hover:text-white">
-              Orders
-            </Link>
-            <Link href="/bag" className="block text-sm text-gray-400 hover:text-white">
+            {isAuthenticated && (
+              <>
+                <Link href="/orders" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
+                  Orders
+                </Link>
+                <Link href="/payment-history" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
+                  Payments
+                </Link>
+              </>
+            )}
+            <Link href="/bag" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
               Bag
             </Link>
-            <Link href="/signin" className="block text-sm text-gray-400 hover:text-white">
-              Sign In
-            </Link>
-            <Link
-              href="/register"
-              className="w-full bg-white text-black px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors mt-4 inline-block text-center"
-            >
-              Pre-Order
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <div className="pt-2 border-t border-white/10">
+                  <p className="text-sm text-gray-400 mb-2">{user?.name || user?.email}</p>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/signin" className="block text-sm text-gray-400 hover:text-white" onClick={() => setIsMenuOpen(false)}>
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="w-full bg-white text-black px-6 py-2.5 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors mt-4 inline-block text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pre-Order
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

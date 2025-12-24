@@ -5,39 +5,36 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useLogin } from "@/lib/api/queries"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function SignInPage() {
   const router = useRouter()
+  const { login } = useAuth()
+  const loginMutation = useLogin()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
   const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    setLoading(true)
 
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to sign in")
+      const response = await loginMutation.mutateAsync(formData)
+      
+      // Handle login response - adjust based on actual API response structure
+      if (response.user || response.id) {
+        const user = response.user || response
+        login(user, response.token)
+        router.push("/")
+      } else {
+        throw new Error("Invalid response from server")
       }
-
-      router.push("/")
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong")
-    } finally {
-      setLoading(false)
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || "Failed to sign in")
     }
   }
 
@@ -108,10 +105,10 @@ export default function SignInPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loginMutation.isPending}
             className="w-full bg-blue-600 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loginMutation.isPending ? "Signing in..." : "Sign In"}
           </button>
         </form>
       </div>
